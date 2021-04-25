@@ -1,6 +1,6 @@
 # vue-music-data-visualization
 
-wyy音乐数据
+wyy音乐数据可视化
 
 ## Project setup
 ```
