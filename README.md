@@ -1,6 +1,9 @@
 # vue-music-data-visualization
 
-wyy音乐数据可视化
+wyy 模拟购物功能等
+
+需要另外安装接口项目
+在 `NeteaseCloudMusicApi` 文件夹中，安装方式在下面。
 
 ## Project setup
 ```
@@ -24,3 +27,18 @@ yarn lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+-------------------------------------
+
+
+## interface setup
+```
+cd NeteaseCloudMusicApi
+```
+
+### install & run
+```
+npm install
+
+node app.js
+``` 
