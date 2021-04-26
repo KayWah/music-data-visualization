@@ -12,15 +12,17 @@
         <Button size="mini" @click="removeGoods(goods)" type="danger"
           >删除</Button
         >
+        <Checkbox v-model="checkedStatus" @change="changeChecked" v-if="showChecked"></Checkbox>
       </template>
     </Card>
   </div>
 </template>
 
 <script>
-import { ref, toRefs } from 'vue'
+// , toRefs
+import { ref } from 'vue'
 import { mapGetters, mapActions } from 'vuex'
-import { Button, Card, Stepper } from 'vant'
+import { Button, Card, Stepper, Checkbox } from 'vant'
 // import { filterGoodsInCarts, filterGoodsIsInArray } from 'api/filterData'
 
 export default {
@@ -30,10 +32,15 @@ export default {
     }
   },
   props: {
-    goods: {}
+    goods: {},
+    showChecked: {
+      type: Boolean,
+      default: false
+    }
   },
   mounted () {
     this.setStepper(this.goods.num)
+    this.setCheckedStatus(this.goods.checked)
   },
   computed: {
     ...mapGetters([
@@ -47,17 +54,25 @@ export default {
     changeNum (value) {
       this.$emit('changeNum', value, this.goods)
     },
+    changeChecked (value) {
+      this.$emit('changeChecked', value, this.goods)
+    },
     ...mapActions([
       'updateCarts'
     ])
   },
   updated () {
     this.setStepper(this.goods.num)
+    this.setCheckedStatus(this.goods.checked)
   },
   setup () {
     const stepperNum = ref(3)
+    const checkedStatus = ref(false)
     function setStepper (num) {
       stepperNum.value = num
+    }
+    function setCheckedStatus (num) {
+      checkedStatus.value = num
     }
     async function newActionCarts () {
       this.updateCarts({
@@ -65,16 +80,20 @@ export default {
       })
     }
     return {
-      ...toRefs(stepperNum),
+      // ...toRefs(stepperNum),
+      // ...toRefs(checkedStatus),
       newActionCarts,
       setStepper,
-      stepperNum
+      stepperNum,
+      checkedStatus,
+      setCheckedStatus
     }
   },
   components: {
     Button,
     Card,
-    Stepper
+    Stepper,
+    Checkbox
   }
 }
 </script>

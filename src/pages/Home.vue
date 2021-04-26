@@ -99,7 +99,7 @@ export default {
     // this.getSEARCHHOTDETAILS()
     this.getHighquality().then(res => {
       console.log(res)
-      const fieldName = ['id', 'name', 'description', 'subscribedCount', 'coverImgUrl']
+      const fieldName = ['id', 'name', 'description', 'subscribedCount', 'coverImgUrl', 'newImported']
       const data = filterFieldData(fieldName, res)
       this.goods = data
       console.log(data)
@@ -131,7 +131,7 @@ export default {
         const goods = { ...addGood[0], num: ++addGood[0].num }
         arr.push(...otherGood, goods)
       } else {
-        arr.push(...this.StoreCarts, { ...goods, num: 1, sort: this.StoreCarts.length })
+        arr.push(...this.StoreCarts, { ...goods, num: 1, sort: this.StoreCarts.length, checked: false })
       }
       // this.carts = arr.sort(compare('sort'))
       arr = arr.sort(compare('sort'))

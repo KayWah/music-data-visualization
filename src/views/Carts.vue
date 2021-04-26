@@ -8,9 +8,11 @@
       :class="'card-wrapper'"
     >
       <Goods-Carts
+        :showChecked=false
         :goods="goods"
         @removeGoods="removeGoods"
         @changeNum="changeNum"
+        @changeChecked="changeChecked"
       ></Goods-Carts>
     </Col>
   </Row>
@@ -63,6 +65,13 @@ export default {
       const changeGoods = filterGoodsIsInArray(this.StoreCarts, goods)[0]
       const otherGoods = filterGoodsInCarts(this.StoreCarts, goods)
       const newGoods = { ...changeGoods, num: value }
+      this.newActionCarts([...otherGoods, newGoods].sort(compare('sort')))
+      localStorage.setItem('carts', JSON.stringify(this.StoreCarts))
+    },
+    changeChecked (value, goods) {
+      const changeGoods = filterGoodsIsInArray(this.StoreCarts, goods)[0]
+      const otherGoods = filterGoodsInCarts(this.StoreCarts, goods)
+      const newGoods = { ...changeGoods, checked: value }
       this.newActionCarts([...otherGoods, newGoods].sort(compare('sort')))
       localStorage.setItem('carts', JSON.stringify(this.StoreCarts))
     },

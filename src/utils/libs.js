@@ -9,3 +9,18 @@ export function compare (fieldName) {
     return value1 - value2
   }
 }
+
+export const sumPrice = (cartItems) => {
+  return cartItems.reduce((sum, cur) => sum + cur.price, 0)
+}
+
+// 返回已选中的所有cartItems
+// export const filterChecked = () => {
+//   return (
+//     Object.entries(checkedMap)
+//       // 通过这个filter 筛选出所有checked状态为true的项
+//       .filter((entries) => Boolean(entries[1]))
+//       // 再从cartData中根据id来map出选中列表
+//       .map(([checkedId]) => cartData.find(({ id }) => id === Number(checkedId)))
+//   )
+// }
