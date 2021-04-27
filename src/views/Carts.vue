@@ -8,7 +8,7 @@
       :class="'card-wrapper'"
     >
       <Goods-Carts
-        :showChecked=false
+        :showChecked="false"
         :goods="goods"
         @removeGoods="removeGoods"
         @changeNum="changeNum"
@@ -28,7 +28,7 @@ import { ref } from 'vue'
 
 import GoodsCarts from 'components/GoodsCarts'
 
-import { compare } from 'utils/libs'
+import { compare, localStorageAction } from 'utils/libs'
 
 import { mapGetters, mapActions } from 'vuex'
 
@@ -74,6 +74,8 @@ export default {
       const newGoods = { ...changeGoods, checked: value }
       this.newActionCarts([...otherGoods, newGoods].sort(compare('sort')))
       localStorage.setItem('carts', JSON.stringify(this.StoreCarts))
+      localStorageAction('save', 'cartss', goods)
+      this.computedCartsSelectedGoods()
     },
     ...mapActions([
       'updateCarts'
@@ -92,10 +94,16 @@ export default {
         carts: arr
       })
     }
+    // 计算购物车已选
+    async function computedCartsSelectedGoods () {
+      const a = localStorageAction('get', 'saveCarts')
+      console.log(a)
+    }
     return {
       newActionCarts,
       loading,
-      setLoading
+      setLoading,
+      computedCartsSelectedGoods
     }
   },
   components: {

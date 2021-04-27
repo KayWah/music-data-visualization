@@ -24,3 +24,16 @@ export const sumPrice = (cartItems) => {
 //       .map(([checkedId]) => cartData.find(({ id }) => id === Number(checkedId)))
 //   )
 // }
+
+export const localStorageAction = (type, name, data) => {
+  const action = {
+    get: () => JSON.parse(localStorage.getItem(name)),
+    set: () => {
+      console.log(23)
+      data && localStorage.setItem(name, JSON.stringify(data))
+    },
+    remove: () => localStorage.remove(name)
+  }
+  console.log(type, name, data)
+  return name && action[type]()
+}

@@ -19,7 +19,7 @@
       </Col>
     </Row>
     <Row>
-      <SubmitBar></SubmitBar>
+      <SubmitBar ref="SubmitBar" :selectedGoods="selectedGoods" ></SubmitBar>
     </Row>
   </Popup>
 </template>
@@ -28,7 +28,7 @@
 import GoodsCarts from './GoodsCarts'
 import SubmitBar from './SubmitBar'
 
-import { compare } from 'utils/libs'
+import { compare, localStorageAction } from 'utils/libs'
 
 import { mapGetters, mapActions } from 'vuex'
 
@@ -39,15 +39,37 @@ import { filterGoodsInCarts, filterGoodsIsInArray } from 'api/filterData'
 
 export default {
   name: 'cart',
-  // data () {
-  //   return {
-  //     checkedAll: false
-  //   }
-  // },
-  setup () {
+  setup (props) {
     const show = ref(false)
+    const selectedGoods = ref([])
     const showPopup = () => {
       show.value = true
+    }
+    const setSelectedGoods = (goods) => {
+      console.log(goods)
+      selectedGoods.value = goods
+    }
+    /**
+     * 计算购物车已选
+     * @params type 选中状态
+     * @params goods 选中商品
+    */
+    async function computedCartsSelectedGoods (selectType, goods) {
+      const oldSelectedCartsGoods = localStorageAction('get', 'saveCarts')
+      let newSelectedCartsGoods = []
+      if (selectType) {
+        if (oldSelectedCartsGoods) {
+          newSelectedCartsGoods = [...oldSelectedCartsGoods, goods]
+        } else {
+          newSelectedCartsGoods = [goods]
+        }
+      } else {
+        newSelectedCartsGoods = oldSelectedCartsGoods.filter(item => {
+          return item.id !== goods.id
+        })
+      }
+      localStorageAction('set', 'saveCarts', newSelectedCartsGoods)
+      this.setSelectedGoods(newSelectedCartsGoods)
     }
     async function newActionCarts (arr) {
       this.updateCarts({
@@ -57,7 +79,10 @@ export default {
     return {
       show,
       showPopup,
-      newActionCarts
+      newActionCarts,
+      computedCartsSelectedGoods,
+      setSelectedGoods,
+      selectedGoods
     }
   },
   created () {
@@ -65,6 +90,8 @@ export default {
     if (carts) {
       this.newActionCarts(JSON.parse(carts))
     }
+    const selectedArray = localStorageAction('get', 'saveCarts') || []
+    this.setSelectedGoods(selectedArray)
   },
   updated () {
     console.log('Cart------------')
@@ -79,14 +106,17 @@ export default {
       const otherGoods = filterGoodsInCarts(this.StoreCarts, goods)
       const newGoods = { ...changeGoods, num: value }
       this.newActionCarts([...otherGoods, newGoods].sort(compare('sort')))
-      localStorage.setItem('carts', JSON.stringify(this.StoreCarts))
+      localStorageAction('set', 'carts', this.StoreCarts)
+      // this.computedCartsSelectedGoods(value, goods)
     },
     changeChecked (value, goods) {
       const changeGoods = filterGoodsIsInArray(this.StoreCarts, goods)[0]
       const otherGoods = filterGoodsInCarts(this.StoreCarts, goods)
       const newGoods = { ...changeGoods, checked: value }
       this.newActionCarts([...otherGoods, newGoods].sort(compare('sort')))
-      localStorage.setItem('carts', JSON.stringify(this.StoreCarts))
+      localStorageAction('set', 'carts', this.StoreCarts)
+      this.computedCartsSelectedGoods(value, goods)
+      // this.$refs.SubmitBar.computedPrice(this.selectedGoods)
     },
     ...mapActions([
       'updateCarts'
