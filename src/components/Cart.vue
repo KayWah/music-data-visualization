@@ -19,7 +19,11 @@
       </Col>
     </Row>
     <Row>
-      <SubmitBar ref="SubmitBar" :selectedGoods="selectedGoods" ></SubmitBar>
+      <SubmitBar
+        ref="SubmitBar"
+        :checkedMap="checkedMap"
+        :price="price"
+      ></SubmitBar>
     </Row>
   </Popup>
 </template>
@@ -40,74 +44,112 @@ import { filterGoodsInCarts, filterGoodsIsInArray } from 'api/filterData'
 export default {
   name: 'cart',
   setup (props) {
+    // 是否显示购物车列表
     const show = ref(false)
-    const selectedGoods = ref([])
+    // 购物车总金额
+    const price = ref(0)
+    // 选中的商品对象数组
+    const checkedMap = ref([])
     const showPopup = () => {
       show.value = true
     }
-    const setSelectedGoods = (goods) => {
-      console.log(goods)
-      selectedGoods.value = goods
+    /**
+     * 方法说明
+     * @method 修改勾选的商品状态和id数组内容
+     * @param {Object} newCheckedMap 新的勾选的商品状态和id
+     */
+    const setCheckedMap = (newCheckedMap) => {
+      checkedMap.value = newCheckedMap
     }
     /**
-     * 计算购物车已选
-     * @params type 选中状态
-     * @params goods 选中商品
-    */
-    async function computedCartsSelectedGoods (selectType, goods) {
-      const oldSelectedCartsGoods = localStorageAction('get', 'saveCarts')
-      let newSelectedCartsGoods = []
-      if (selectType) {
-        if (oldSelectedCartsGoods) {
-          newSelectedCartsGoods = [...oldSelectedCartsGoods, goods]
-        } else {
-          newSelectedCartsGoods = [goods]
-        }
-      } else {
-        newSelectedCartsGoods = oldSelectedCartsGoods.filter(item => {
-          return item.id !== goods.id
-        })
-      }
-      localStorageAction('set', 'saveCarts', newSelectedCartsGoods)
-      this.setSelectedGoods(newSelectedCartsGoods)
+     * 方法说明
+     * @method 计算购物车已选
+     * @param {Boolean} selectType 商品的选中状态
+     * @param {Object} cartItem 商品
+     * @return {Object} 返回勾选的商品状态和id
+     */
+    async function computedCheckedMap (selectType, cartItem) {
+      const { id } = cartItem
+      const oldCheckedMap = localStorageAction('get', 'checkMap')
+      const newCheckedMap = Object.assign({}, oldCheckedMap, {
+        [id]: selectType
+      })
+      localStorageAction('set', 'checkMap', newCheckedMap)
+      this.setCheckedMap(newCheckedMap)
+      return newCheckedMap
     }
+    /**
+     * 方法说明
+     * @method 更新vuex购物车列表
+     * @param {Array} arr 添加到购物车列表的数组
+     */
     async function newActionCarts (arr) {
       this.updateCarts({
         carts: arr
       })
     }
+    /**
+     * 方法说明
+     * @method 计算购物车已选商品总金额
+     * @param {Object} checkedMap 勾选的商品状态和id
+     */
+    async function computedPrice (checkedMap) {
+      const carts = Object.entries(checkedMap)
+        // 通过这个filter 筛选出所有checked状态为true的项
+        .filter((entries) => Boolean(entries[1]))
+        .map(([checkedId]) =>
+          localStorageAction('get', 'carts').find(
+            ({ id }) => id === Number(checkedId)
+          )
+        )
+      let totalPrice = 0
+      carts.forEach((element) => {
+        totalPrice += element.subscribedCount * element.num
+      })
+      price.value = totalPrice * 100
+    }
     return {
       show,
       showPopup,
       newActionCarts,
-      computedCartsSelectedGoods,
-      setSelectedGoods,
-      selectedGoods
+      computedCheckedMap,
+      setCheckedMap,
+      checkedMap,
+      computedPrice,
+      price
     }
   },
   created () {
+    console.log('Cart-created------------')
     const carts = localStorage.getItem('carts')
     if (carts) {
       this.newActionCarts(JSON.parse(carts))
     }
     const selectedArray = localStorageAction('get', 'saveCarts') || []
-    this.setSelectedGoods(selectedArray)
+    this.setCheckedMap(selectedArray)
   },
   updated () {
-    console.log('Cart------------')
+    console.log('Cart-updated------------')
   },
   methods: {
     removeGoods (goods) {
       const arr = filterGoodsInCarts(this.StoreCarts, goods)
+      const oldCheckedMap = localStorageAction('get', 'checkMap')
+      delete oldCheckedMap[goods.id]
       this.newActionCarts(arr)
+      localStorageAction('set', 'checkMap', oldCheckedMap)
+      this.computedPrice(oldCheckedMap)
     },
     changeNum (value, goods) {
+      // 购物车
       const changeGoods = filterGoodsIsInArray(this.StoreCarts, goods)[0]
       const otherGoods = filterGoodsInCarts(this.StoreCarts, goods)
       const newGoods = { ...changeGoods, num: value }
       this.newActionCarts([...otherGoods, newGoods].sort(compare('sort')))
       localStorageAction('set', 'carts', this.StoreCarts)
-      // this.computedCartsSelectedGoods(value, goods)
+
+      this.computedCheckedMap(goods.checked, newGoods)
+      this.computedPrice(this.checkedMap)
     },
     changeChecked (value, goods) {
       const changeGoods = filterGoodsIsInArray(this.StoreCarts, goods)[0]
@@ -115,17 +157,13 @@ export default {
       const newGoods = { ...changeGoods, checked: value }
       this.newActionCarts([...otherGoods, newGoods].sort(compare('sort')))
       localStorageAction('set', 'carts', this.StoreCarts)
-      this.computedCartsSelectedGoods(value, goods)
-      // this.$refs.SubmitBar.computedPrice(this.selectedGoods)
+      this.computedCheckedMap(value, goods)
+      this.computedPrice(this.checkedMap)
     },
-    ...mapActions([
-      'updateCarts'
-    ])
+    ...mapActions(['updateCarts'])
   },
   computed: {
-    ...mapGetters([
-      'StoreCarts'
-    ])
+    ...mapGetters(['StoreCarts'])
   },
   components: {
     Popup,

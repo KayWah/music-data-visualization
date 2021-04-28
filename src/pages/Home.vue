@@ -80,33 +80,14 @@ export default {
     Empty
   },
   created () {
-    // const carts = localStorage.getItem('carts')
-    // if (carts) {
-    //   this.carts = JSON.parse(carts)
-    //   this.newActionCarts(JSON.parse(carts))
-    // }
-    // const goods = localStorage.getItem('goods')
-    // if (goods) {
-    //   this.goods = JSON.parse(goods)
-    // }
   },
   mounted () {
-    // this.getArtist().then(res => {
-    //   const fieldName = ['name', 'albumSize']
-    //   const artists = filterFieldData(fieldName, res)
-    //    this.columnPlot(artists)
-    // })
-    // this.getSEARCHHOTDETAILS()
     this.getHighquality().then(res => {
-      console.log(res)
       const fieldName = ['id', 'name', 'description', 'subscribedCount', 'coverImgUrl', 'newImported']
       const data = filterFieldData(fieldName, res)
       this.goods = data
-      console.log(data)
       this.setLoading(true)
     })
-    // this.getHotTopic()
-    // this.getTopSong()
   },
   computed: {
     ...mapGetters([
@@ -133,7 +114,6 @@ export default {
       } else {
         arr.push(...this.StoreCarts, { ...goods, num: 1, sort: this.StoreCarts.length, checked: false })
       }
-      // this.carts = arr.sort(compare('sort'))
       arr = arr.sort(compare('sort'))
       this.newActionCarts(arr)
       localStorage.setItem('carts', JSON.stringify(arr))

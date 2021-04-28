@@ -9,6 +9,7 @@
 
 <script>
 import { ref } from 'vue'
+// import { localStorageAction } from 'utils/libs'
 
 import { SubmitBar, Checkbox } from 'vant'
 
@@ -19,7 +20,7 @@ export default {
     //   type: Boolean,
     //   default: false
     // },
-    selectedGoods: {
+    checkedMap: {
       type: Array,
       default: () => {
         return []
@@ -27,52 +28,29 @@ export default {
     }
   },
   created () {
-    console.log(this.selectedGoods)
+    console.log(this.checkedMap)
   },
   updated () {
-    console.log(this.selectedGoods)
+    console.log(this.checkedMap)
     console.log('abcccccccc')
-    this.computedPrice(this.selectedGoods)
   },
   mounted () {
-    console.log(this.selectedGoods)
+    console.log(this.checkedMap)
     console.log('abcccccccc')
   },
   computed () {
-    console.log(this.selectedGoods)
+    console.log(this.checkedMap)
     console.log('abcccccccc')
-  },
-  watch: {
-    selectedGoods (newValue, oldValue) {
-      console.log(newValue)
-      console.log(oldValue)
-    }
   },
   methods: {
     onSubmit () {
       console.log('提交')
     }
-    // computedPrice (selectedGoods) {
-    //   console.log(selectedGoods)
-    // }
   },
   setup () {
     const checkedAll = ref(false)
-    const price = ref(0)
-
-    const computedPrice = (goods) => {
-      console.log(goods)
-      let a = 0
-      goods.forEach(element => {
-        a += element.subscribedCount
-      })
-      price.value = a * 100
-      console.log(a)
-    }
     return {
-      checkedAll,
-      computedPrice,
-      price
+      checkedAll
     }
   },
   components: {
@@ -82,5 +60,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
