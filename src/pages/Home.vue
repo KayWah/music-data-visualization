@@ -41,7 +41,7 @@
 <script>
 import { ref } from 'vue'
 // import Category from 'vue-category-tree/dist/vue-cateogry-tree.min'
-import { mapGetters, mapActions } from 'vuex'
+import { useStore, mapGetters, mapActions } from 'vuex'
 
 import { Column } from '@antv/g2plot'
 
@@ -101,7 +101,7 @@ export default {
       this.value = ''
       localStorage.setItem('goods', JSON.stringify(this.goods))
     },
-    addGoods (goods) {
+    addGoods1 (goods) {
       // 当前点击的商品
       const addGood = filterGoodsIsInArray(this.StoreCarts, goods)
       // 购物车的其他商品
@@ -123,6 +123,11 @@ export default {
     ])
   },
   setup (props) {
+    const store = useStore()
+    const StoreGetters = store.getters
+
+    console.log(store)
+
     const loading = ref(false)
     function setLoading (status) {
       loading.value = status
@@ -206,6 +211,26 @@ export default {
       })
     }
 
+    const addGoods = (goods) => {
+      // 当前点击的商品
+      const addGood = filterGoodsIsInArray(StoreGetters.StoreCarts || [], goods)
+      // 购物车的其他商品
+      const otherGood = filterGoodsInCarts(StoreGetters.StoreCarts || [], goods)
+      // 如果已经加入购物车
+      let arr = []
+      if (addGood.length > 0) {
+        const goods = { ...addGood[0], num: ++addGood[0].num }
+        arr.push(...otherGood, goods)
+      } else {
+        arr.push(...store.getters.StoreCarts,
+          { ...goods, num: 1, sort: store.getters.StoreCarts.length, checked: false })
+      }
+      arr = arr.sort(compare('sort'))
+      // newActionCarts(arr)
+      store.dispatch('updateCarts', { carts: arr })
+      localStorage.setItem('carts', JSON.stringify(arr))
+    }
+
     return {
       loading,
       getArtist,
@@ -215,7 +240,8 @@ export default {
       getHotTopic,
       getHighquality,
       newActionCarts,
-      setLoading
+      setLoading,
+      addGoods
     }
   }
 }
