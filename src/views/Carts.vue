@@ -8,7 +8,7 @@
       :class="'card-wrapper'"
     >
       <Goods-Carts
-        :showChecked="false"
+        :showChecked="true"
         :goods="goods"
         @removeGoods="removeGoods"
         @changeNum="changeNum"
@@ -18,21 +18,23 @@
   </Row>
   <Row v-else>
     <Col span="24">
-      <Empty image="error" description="赶紧去剁手吧"></Empty>
+      <empty-goods image="error" description="赶紧去剁手吧"></empty-goods>
     </Col>
   </Row>
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onUpdated, computed } from 'vue'
 
 import GoodsCarts from 'components/GoodsCarts'
 
+import EmptyGoods from 'components/EmptyGoods'
+
 import { compare, localStorageAction } from 'utils/libs'
 
-import { mapGetters, mapActions } from 'vuex'
+import { useStore } from 'vuex'
 
-import { Col, Row, Empty, Loading } from 'vant'
+import { Col, Row, Loading } from 'vant'
 
 import { filterGoodsInCarts, filterGoodsIsInArray } from 'api/filterData'
 
@@ -43,78 +45,103 @@ export default {
       carts: []
     }
   },
-  created () {
-    const carts = localStorage.getItem('carts')
-    if (carts) {
-      this.newActionCarts(JSON.parse(carts))
-    }
-    this.setLoading(true)
-  },
-  computed: {
-    ...mapGetters([
-      'StoreCarts'
-    ])
-  },
-  methods: {
-    removeGoods (goods) {
-      const arr = filterGoodsInCarts(this.StoreCarts, goods)
-      localStorage.setItem('carts', JSON.stringify(arr))
-      this.newActionCarts(arr)
-    },
-    changeNum (value, goods) {
-      const changeGoods = filterGoodsIsInArray(this.StoreCarts, goods)[0]
-      const otherGoods = filterGoodsInCarts(this.StoreCarts, goods)
-      const newGoods = { ...changeGoods, num: value }
-      this.newActionCarts([...otherGoods, newGoods].sort(compare('sort')))
-      localStorage.setItem('carts', JSON.stringify(this.StoreCarts))
-    },
-    changeChecked (value, goods) {
-      const changeGoods = filterGoodsIsInArray(this.StoreCarts, goods)[0]
-      const otherGoods = filterGoodsInCarts(this.StoreCarts, goods)
-      const newGoods = { ...changeGoods, checked: value }
-      this.newActionCarts([...otherGoods, newGoods].sort(compare('sort')))
-      localStorage.setItem('carts', JSON.stringify(this.StoreCarts))
-      localStorageAction('save', 'cartss', goods)
-      this.computedCartsSelectedGoods()
-    },
-    ...mapActions([
-      'updateCarts'
-    ])
-  },
   updated () {
-    console.log('Carts===============')
+    console.log('Cart-updateds===============')
   },
   setup () {
+    const store = useStore()
+    const StoreGetters = store.getters
+
+    const carts = localStorage.getItem('carts')
+
     const loading = ref(false)
+
+    onUpdated(() => {
+      console.log(StoreGetters)
+    })
+
+    // 设置加载状态
     function setLoading (status) {
       loading.value = status
     }
-    async function newActionCarts (arr) {
-      this.updateCarts({
-        carts: arr
-      })
+
+    /**
+     * 方法说明
+     * @method 更新状态
+     * @param {Array} data 更新的产品数据
+     */
+    function updateCarts (data) {
+      store.dispatch('updateCarts', { carts: data })
     }
+
     // 计算购物车已选
     async function computedCartsSelectedGoods () {
-      const a = localStorageAction('get', 'saveCarts')
-      console.log(a)
+      localStorageAction('get', 'saveCarts')
     }
+
+    /**
+     * 方法说明
+     * @method 删除商品
+     * @param {Object} goods 需要删除的产品数据
+     */
+    function removeGoods (goods) {
+      const arr = filterGoodsInCarts(StoreGetters.StoreCarts, goods)
+      updateCarts(arr)
+      localStorageAction('set', 'carts', arr)
+      // 更新选择状态
+      const oldCheckedMap = localStorageAction('get', 'checkedMap')
+      delete oldCheckedMap[goods.id]
+      localStorageAction('set', 'checkedMap', oldCheckedMap)
+    }
+
+    // 修改商品数量
+    function changeNum (value, goods) {
+      const changeGoods = filterGoodsIsInArray(
+        StoreGetters.StoreCarts,
+        goods
+      )[0]
+      const otherGoods = filterGoodsInCarts(StoreGetters.StoreCarts, goods)
+      const newGoods = { ...changeGoods, num: value }
+      updateCarts([...otherGoods, newGoods].sort(compare('sort')))
+      localStorage.setItem('carts', JSON.stringify(StoreGetters.StoreCarts))
+    }
+
+    function changeChecked (value, goods) {
+      const changeGoods = filterGoodsIsInArray(
+        StoreGetters.StoreCarts,
+        goods
+      )[0]
+      const otherGoods = filterGoodsInCarts(StoreGetters.StoreCarts, goods)
+      const newGoods = { ...changeGoods, checked: value }
+      updateCarts([...otherGoods, newGoods].sort(compare('sort')))
+      localStorageAction('set', 'carts', StoreGetters.StoreCarts)
+    }
+
+    if (carts) {
+      updateCarts(JSON.parse(carts))
+      // StoreCarts.value = JSON.parse(carts)
+    }
+
+    setLoading(true)
+
     return {
-      newActionCarts,
       loading,
       setLoading,
-      computedCartsSelectedGoods
+      computedCartsSelectedGoods,
+      changeNum,
+      removeGoods,
+      changeChecked,
+      StoreCarts: computed(() => store.state.StoreCarts)
     }
   },
   components: {
     GoodsCarts,
     Col,
     Row,
-    Empty,
-    Loading
+    Loading,
+    EmptyGoods
   }
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

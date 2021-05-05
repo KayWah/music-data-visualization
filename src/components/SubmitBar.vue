@@ -9,17 +9,12 @@
 
 <script>
 import { ref } from 'vue'
-// import { localStorageAction } from 'utils/libs'
 
 import { SubmitBar, Checkbox } from 'vant'
 
 export default {
   name: 'submit-bar',
   props: {
-    // show: {
-    //   type: Boolean,
-    //   default: false
-    // },
     checkedMap: {
       type: Array,
       default: () => {
@@ -27,20 +22,13 @@ export default {
       }
     }
   },
-  created () {
-    console.log(this.checkedMap)
-  },
   updated () {
-    console.log(this.checkedMap)
-    console.log('abcccccccc')
-  },
-  mounted () {
-    console.log(this.checkedMap)
-    console.log('abcccccccc')
+    // console.log(this.checkedMap)
+    // console.log('abcccccccc')
   },
   computed () {
-    console.log(this.checkedMap)
-    console.log('abcccccccc')
+    // console.log(this.checkedMap)
+    // console.log('abcccccccc')
   },
   methods: {
     onSubmit () {

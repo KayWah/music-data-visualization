@@ -2,7 +2,9 @@
   <div>
     <Card
       :title="goods.name"
-      :price="`${goods.subscribedCount.toFixed(2)}`"
+      :price="
+        `${goods.subscribedCount ? goods.subscribedCount.toFixed(2) : 0.0}`
+      "
       :thumb="goods.coverImgUrl"
       :desc="goods.description"
       :num="goods.num"
@@ -12,7 +14,11 @@
         <Button size="mini" @click="removeGoods(goods)" type="danger"
           >删除</Button
         >
-        <Checkbox v-model="checkedStatus" @change="changeChecked" v-if="showChecked"></Checkbox>
+        <Checkbox
+          v-model="checkedStatus"
+          @change="changeChecked"
+          v-if="showChecked"
+        ></Checkbox>
       </template>
     </Card>
   </div>
@@ -28,8 +34,7 @@ import { Button, Card, Stepper, Checkbox } from 'vant'
 export default {
   name: 'goods-carts',
   data () {
-    return {
-    }
+    return {}
   },
   props: {
     goods: {},
@@ -43,29 +48,25 @@ export default {
     this.setCheckedStatus(this.goods.checked)
   },
   computed: {
-    ...mapGetters([
-      'StoreCarts'
-    ])
+    ...mapGetters(['StoreCarts'])
   },
   methods: {
-    removeGoods (goods) {
-      this.$emit('removeGoods', goods)
-    },
-    changeNum (value) {
-      this.$emit('changeNum', value, this.goods)
-    },
-    changeChecked (value) {
-      this.$emit('changeChecked', value, this.goods)
-    },
-    ...mapActions([
-      'updateCarts'
-    ])
+    // removeGoods (goods) {
+    //   this.$emit('removeGoods', goods)
+    // },
+    // changeNum (value) {
+    //   this.$emit('changeNum', value, this.goods)
+    // },
+    // changeChecked (value) {
+    //   this.$emit('changeChecked', value, this.goods)
+    // },
+    ...mapActions(['updateCarts'])
   },
   updated () {
     this.setStepper(this.goods.num)
     this.setCheckedStatus(this.goods.checked)
   },
-  setup () {
+  setup (props, { emit }) {
     const stepperNum = ref(3)
     const checkedStatus = ref(false)
     function setStepper (num) {
@@ -79,14 +80,30 @@ export default {
         carts: this.carts
       })
     }
+
+    function removeGoods (goods) {
+      emit('removeGoods', goods)
+    }
+
+    function changeNum (value) {
+      console.log(value)
+      console.log(props.goods)
+      emit('changeNum', value, props.goods)
+    }
+
+    function changeChecked (value) {
+      emit('changeChecked', value, props.goods)
+    }
+
     return {
-      // ...toRefs(stepperNum),
-      // ...toRefs(checkedStatus),
       newActionCarts,
       setStepper,
       stepperNum,
       checkedStatus,
-      setCheckedStatus
+      setCheckedStatus,
+      removeGoods,
+      changeNum,
+      changeChecked
     }
   },
   components: {
@@ -98,5 +115,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

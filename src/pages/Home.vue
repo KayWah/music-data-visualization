@@ -1,13 +1,5 @@
 <template>
   <div>
-    <!-- <Row>
-      <Col span="20">
-        <Field v-model="value" label="文本" placeholder="请输入用户名"></Field>
-      </Col>
-      <Col span="4">
-        <Button type="primary" @click="newGoods">添加</Button>
-      </Col>
-    </Row> -->
     <Loading v-if="!loading"></Loading>
     <Row v-else-if="loading && goods.length > 0">
       <Col
@@ -40,8 +32,8 @@
 
 <script>
 import { ref } from 'vue'
-// import Category from 'vue-category-tree/dist/vue-cateogry-tree.min'
-import { useStore, mapGetters, mapActions } from 'vuex'
+// , mapGetters, mapActions
+import { useStore } from 'vuex'
 
 import { Column } from '@antv/g2plot'
 
@@ -89,39 +81,22 @@ export default {
       this.setLoading(true)
     })
   },
-  computed: {
-    ...mapGetters([
-      'StoreCarts'
-    ])
-  },
-  methods: {
-    newGoods () {
-      const price = Math.floor(Math.random() * 100).toFixed(2)
-      this.goods.push({ title: this.value, key: this.goods.length, price, desc: this.value + '描述信息' })
-      this.value = ''
-      localStorage.setItem('goods', JSON.stringify(this.goods))
-    },
-    addGoods1 (goods) {
-      // 当前点击的商品
-      const addGood = filterGoodsIsInArray(this.StoreCarts, goods)
-      // 购物车的其他商品
-      const otherGood = filterGoodsInCarts(this.StoreCarts, goods)
-      // 如果已经加入购物车
-      let arr = []
-      if (addGood.length > 0) {
-        const goods = { ...addGood[0], num: ++addGood[0].num }
-        arr.push(...otherGood, goods)
-      } else {
-        arr.push(...this.StoreCarts, { ...goods, num: 1, sort: this.StoreCarts.length, checked: false })
-      }
-      arr = arr.sort(compare('sort'))
-      this.newActionCarts(arr)
-      localStorage.setItem('carts', JSON.stringify(arr))
-    },
-    ...mapActions([
-      'updateCarts'
-    ])
-  },
+  // computed: {
+  //   ...mapGetters([
+  //     'StoreCarts'
+  //   ])
+  // },
+  // methods: {
+  //   newGoods () {
+  //     const price = Math.floor(Math.random() * 100).toFixed(2)
+  //     this.goods.push({ title: this.value, key: this.goods.length, price, desc: this.value + '描述信息' })
+  //     this.value = ''
+  //     localStorage.setItem('goods', JSON.stringify(this.goods))
+  //   },
+  //   ...mapActions([
+  //     'updateCarts'
+  //   ])
+  // },
   setup (props) {
     const store = useStore()
     const StoreGetters = store.getters
@@ -212,6 +187,7 @@ export default {
     }
 
     const addGoods = (goods) => {
+      console.log(typeof StoreGetters.StoreCarts)
       // 当前点击的商品
       const addGood = filterGoodsIsInArray(StoreGetters.StoreCarts || [], goods)
       // 购物车的其他商品
