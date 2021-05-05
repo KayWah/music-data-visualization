@@ -86,8 +86,6 @@ export default {
     }
 
     function changeNum (value) {
-      console.log(value)
-      console.log(props.goods)
       emit('changeNum', value, props.goods)
     }
 

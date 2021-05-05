@@ -15,10 +15,14 @@ import { SubmitBar, Checkbox } from 'vant'
 export default {
   name: 'submit-bar',
   props: {
+    price: {
+      type: Number,
+      default: 0
+    },
     checkedMap: {
-      type: Array,
+      type: Object,
       default: () => {
-        return []
+        return {}
       }
     }
   },

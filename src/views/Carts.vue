@@ -35,8 +35,12 @@ import { compare, localStorageAction } from 'utils/libs'
 import { useStore } from 'vuex'
 
 import { Col, Row, Loading } from 'vant'
+// , filterGoodsIsInArray
+// import { filterGoodsInCarts } from 'api/filterData'
 
-import { filterGoodsInCarts, filterGoodsIsInArray } from 'api/filterData'
+import useChangeNumber from '../hooks/useChangeNumber'
+import useChangeCheckedType from '../hooks/useChangeCheckedType'
+import useRemoveGoods from '../hooks/useRemoveGoods'
 
 export default {
   name: 'cart',
@@ -57,7 +61,6 @@ export default {
     const loading = ref(false)
 
     onUpdated(() => {
-      console.log(StoreGetters)
     })
 
     // 设置加载状态
@@ -85,7 +88,7 @@ export default {
      * @param {Object} goods 需要删除的产品数据
      */
     function removeGoods (goods) {
-      const arr = filterGoodsInCarts(StoreGetters.StoreCarts, goods)
+      const arr = useRemoveGoods(goods, StoreGetters.StoreCarts)
       updateCarts(arr)
       localStorageAction('set', 'carts', arr)
       // 更新选择状态
@@ -96,30 +99,19 @@ export default {
 
     // 修改商品数量
     function changeNum (value, goods) {
-      const changeGoods = filterGoodsIsInArray(
-        StoreGetters.StoreCarts,
-        goods
-      )[0]
-      const otherGoods = filterGoodsInCarts(StoreGetters.StoreCarts, goods)
-      const newGoods = { ...changeGoods, num: value }
+      const { otherGoods, newGoods } = useChangeNumber(value, goods, StoreGetters.StoreCarts)
       updateCarts([...otherGoods, newGoods].sort(compare('sort')))
       localStorage.setItem('carts', JSON.stringify(StoreGetters.StoreCarts))
     }
 
     function changeChecked (value, goods) {
-      const changeGoods = filterGoodsIsInArray(
-        StoreGetters.StoreCarts,
-        goods
-      )[0]
-      const otherGoods = filterGoodsInCarts(StoreGetters.StoreCarts, goods)
-      const newGoods = { ...changeGoods, checked: value }
+      const { otherGoods, newGoods } = useChangeCheckedType(value, goods, StoreGetters.StoreCarts)
       updateCarts([...otherGoods, newGoods].sort(compare('sort')))
       localStorageAction('set', 'carts', StoreGetters.StoreCarts)
     }
 
     if (carts) {
       updateCarts(JSON.parse(carts))
-      // StoreCarts.value = JSON.parse(carts)
     }
 
     setLoading(true)
