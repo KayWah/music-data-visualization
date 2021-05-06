@@ -23,6 +23,8 @@
         ref="SubmitBar"
         :checkedMap="checkedMap"
         :price="price"
+        :submitCarts="submitCarts"
+        :submitLoading="submitLoading"
       ></SubmitBar>
     </Row>
   </Popup>
@@ -39,7 +41,7 @@ import { setDispatch } from 'utils/store'
 import { useStore } from 'vuex'
 // computed,, onUpdated
 import { ref, computed } from 'vue'
-import { Popup, Row, Col } from 'vant'
+import { Popup, Row, Col, Dialog } from 'vant'
 
 // import { filterGoodsInCarts } from 'api/filterData'
 
@@ -57,6 +59,8 @@ export default {
 
     // 是否显示购物车列表
     const show = ref(false)
+    // 提交订单是否loading
+    const submitLoading = ref(false)
     // 购物车总金额
     const price = ref(0)
     // 选中的商品对象数组
@@ -162,6 +166,23 @@ export default {
       computedPrice({ value: oldCheckedMap })
     }
 
+    /**
+     * 提交事件
+    * @method 提交事件
+     * @param {Number} price 选中的产品价格
+    */
+    function submitCarts (price) {
+      // Dialog('您已选商品总价为' + price)
+      submitLoading.value = true
+      setTimeout(() => {
+        submitLoading.value = false
+      }, 1000)
+      Dialog.alert({
+        message: '您已选商品总价为 ' + (price * 0.01).toFixed(2) + ' 元'
+      }).then(() => {
+      })
+    }
+
     if (carts) {
       updateCarts(JSON.parse(carts))
     }
@@ -179,14 +200,10 @@ export default {
       removeGoods,
       changeNum,
       changeChecked,
+      submitCarts,
+      submitLoading,
       StoreCarts: computed(() => store.state.StoreCarts)
     }
-  },
-  created () {
-    console.log('Cart-created------------')
-  },
-  updated () {
-    console.log('Cart-updated------------')
   },
   components: {
     Popup,

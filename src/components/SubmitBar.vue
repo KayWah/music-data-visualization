@@ -1,9 +1,11 @@
 <template>
-  <SubmitBar :price="price" button-text="提交订单" @submit="onSubmit">
+  <SubmitBar
+    :price="price"
+    button-text="提交订单"
+    @submit="submitCarts(price)"
+    :loading="submitLoading"
+  >
     <Checkbox v-model="checkedAll">全选</Checkbox>
-    <template #tip>
-      你的收货地址不支持同城送, <span @click="onClickLink">修改地址</span>
-    </template>
   </SubmitBar>
 </template>
 
@@ -24,19 +26,16 @@ export default {
       default: () => {
         return {}
       }
-    }
-  },
-  updated () {
-    // console.log(this.checkedMap)
-    // console.log('abcccccccc')
-  },
-  computed () {
-    // console.log(this.checkedMap)
-    // console.log('abcccccccc')
-  },
-  methods: {
-    onSubmit () {
-      console.log('提交')
+    },
+    submitCarts: {
+      type: Function,
+      default: () => {
+        return null
+      }
+    },
+    submitLoading: {
+      type: Boolean,
+      default: false
     }
   },
   setup () {
