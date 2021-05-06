@@ -10,7 +10,6 @@ export function filterDataField (data, name) {
     // }
     return item
   })
-  console.log(arr)
   return arr
 }
 

@@ -9,3 +9,18 @@ export function compare (fieldName) {
     return value1 - value2
   }
 }
+
+export const sumPrice = (cartItems) => {
+  return cartItems.reduce((sum, cur) => sum + cur.price, 0)
+}
+
+export const localStorageAction = (type, name, data) => {
+  const action = {
+    get: () => JSON.parse(localStorage.getItem(name)),
+    set: () => {
+      data && localStorage.setItem(name, JSON.stringify(data))
+    },
+    remove: () => localStorage.remove(name)
+  }
+  return name && action[type]()
+}

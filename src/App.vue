@@ -54,6 +54,7 @@ export default {
   color: #42b983;
 }
 .global-cart-list {
+  overflow: hidden;
   height: 100%;
   width: 400px;
 }
