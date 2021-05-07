@@ -19,6 +19,7 @@
               <Button size="mini" @click="addGoods(good)" type="warning"
                 >加入购物车</Button
               >
+              <i class="add-goods" :id="`${good.id}_add_one`">+1</i>
             </template>
           </Card>
         </Col>
@@ -117,6 +118,10 @@ export default {
       arr = arr.sort(compare('sort'))
       store.dispatch('updateCarts', { carts: arr })
       localStorage.setItem('carts', JSON.stringify(arr))
+      document.getElementById(`${goods.id}_add_one`).classList.add('show')
+      setTimeout(() => {
+        document.getElementById(`${goods.id}_add_one`).classList.remove('show')
+      }, 1000)
     }
 
     return {
@@ -131,4 +136,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.add-goods {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+  &.show {
+    opacity: 1;
+    z-index: 9;
+    color: rgb(226, 12, 112);
+    font-weight: bold;
+    transform: translateY(-30px);
+    transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.4s;
+  }
+}
 </style>

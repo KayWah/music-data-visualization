@@ -43,15 +43,21 @@ export default {
   padding: 10px;
 }
 .cart-fixed {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: fixed;
   bottom: 10px;
   right: 10px;
-  height: 60px;
-  width: 60px;
-  line-height: 60px;
+  font-size: 30px;
   text-align: center;
-  background-color: #2c3e50;
+  background-color: #fff;
   color: #42b983;
+  border-radius: 50px;
+  box-shadow: 0px 0px 3px 1px #2c3e50;
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
 }
 .global-cart-list {
   overflow: hidden;

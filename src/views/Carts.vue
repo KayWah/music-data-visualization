@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref, onUpdated, computed } from 'vue'
+import { ref, computed } from 'vue'
 
 import GoodsCarts from 'components/GoodsCarts'
 
@@ -35,8 +35,6 @@ import { compare, localStorageAction } from 'utils/libs'
 import { useStore } from 'vuex'
 
 import { Col, Row, Loading } from 'vant'
-// , filterGoodsIsInArray
-// import { filterGoodsInCarts } from 'api/filterData'
 
 import useChangeNumber from '../hooks/useChangeNumber'
 import useChangeCheckedType from '../hooks/useChangeCheckedType'
@@ -49,9 +47,6 @@ export default {
       carts: []
     }
   },
-  updated () {
-    console.log('Cart-updateds===============')
-  },
   setup () {
     const store = useStore()
     const StoreGetters = store.getters
@@ -59,9 +54,6 @@ export default {
     const carts = localStorage.getItem('carts')
 
     const loading = ref(false)
-
-    onUpdated(() => {
-    })
 
     // 设置加载状态
     function setLoading (status) {
