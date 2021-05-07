@@ -1,5 +1,10 @@
 <template>
-  <div @click="showPopup" :class="'cart-fixed'">购物车</div>
+  <div @click="showPopup" :class="'cart-fixed'">
+    <Icon
+      name="cart-o"
+      :badge="`${StoreCarts.length > 99 ? '99+' : StoreCarts.length}`"
+    />
+  </div>
   <Popup v-model:show="show" position="right" :class="'global-cart-list'">
     <h3>购物车列表</h3>
     <Row v-if="StoreCarts.length > 0" :class="'carts-fixed_wrapper'">
@@ -25,6 +30,8 @@
         :price="price"
         :submitCarts="submitCarts"
         :submitLoading="submitLoading"
+        :checkedAll="checkedAll"
+        :selectedAll="isSelectedAll()"
       ></SubmitBar>
     </Row>
   </Popup>
@@ -39,11 +46,8 @@ import { compare, localStorageAction } from 'utils/libs'
 import { setDispatch } from 'utils/store'
 
 import { useStore } from 'vuex'
-// computed,, onUpdated
 import { ref, computed } from 'vue'
-import { Popup, Row, Col, Dialog } from 'vant'
-
-// import { filterGoodsInCarts } from 'api/filterData'
+import { Popup, Row, Col, Dialog, Icon } from 'vant'
 
 import useChangeNumber from '../hooks/useChangeNumber'
 import useChangeCheckedType from '../hooks/useChangeCheckedType'
@@ -65,6 +69,9 @@ export default {
     const price = ref(0)
     // 选中的商品对象数组
     const checkedMap = ref([])
+    // 是否全选
+    // const selectedAll = ref(false)
+
     const showPopup = () => {
       show.value = true
     }
@@ -183,6 +190,42 @@ export default {
       })
     }
 
+    /**
+     * @method 选择购物车所有商品
+     * */
+    function checkedAll (type) {
+      // console.log(type)
+      const cartsData = localStorageAction('get', 'carts')
+      const newCheckedMap = {}
+      // console.log(cartsData)
+      cartsData.forEach(item => {
+        item.checked = type
+        newCheckedMap[item.id] = type
+      })
+      updateCarts(cartsData)
+      localStorageAction('set', 'carts', cartsData)
+
+      localStorageAction('set', 'checkedMap', newCheckedMap)
+      setCheckedMap(newCheckedMap)
+    }
+
+    /**
+     * @method 是否全选
+     * */
+    function isSelectedAll () {
+      const oldCheckedMap = localStorageAction('get', 'checkedMap')
+      let selectedNum = 0
+      Object.keys(oldCheckedMap).forEach(item => {
+        // console.log(oldCheckedMap[item])
+        oldCheckedMap[item] && selectedNum++
+      })
+      // console.log(selectedNum)
+      // console.log(Object.keys(oldCheckedMap).length)
+      // console.log(Object.keys(oldCheckedMap).length === selectedNum)
+      return Object.keys(oldCheckedMap).length === selectedNum
+    }
+    isSelectedAll()
+
     if (carts) {
       updateCarts(JSON.parse(carts))
     }
@@ -202,6 +245,8 @@ export default {
       changeChecked,
       submitCarts,
       submitLoading,
+      checkedAll,
+      isSelectedAll,
       StoreCarts: computed(() => store.state.StoreCarts)
     }
   },
@@ -211,7 +256,8 @@ export default {
     Col,
     GoodsCarts,
     SubmitBar,
-    EmptyGoods
+    EmptyGoods,
+    Icon
   }
 }
 </script>
