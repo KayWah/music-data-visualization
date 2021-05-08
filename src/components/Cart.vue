@@ -194,10 +194,8 @@ export default {
      * @method 选择购物车所有商品
      * */
     function checkedAll (type) {
-      // console.log(type)
       const cartsData = localStorageAction('get', 'carts')
       const newCheckedMap = {}
-      // console.log(cartsData)
       cartsData.forEach(item => {
         item.checked = type
         newCheckedMap[item.id] = type
@@ -214,14 +212,11 @@ export default {
      * */
     function isSelectedAll () {
       const oldCheckedMap = localStorageAction('get', 'checkedMap')
+      if (!oldCheckedMap) return false
       let selectedNum = 0
       Object.keys(oldCheckedMap).forEach(item => {
-        // console.log(oldCheckedMap[item])
         oldCheckedMap[item] && selectedNum++
       })
-      // console.log(selectedNum)
-      // console.log(Object.keys(oldCheckedMap).length)
-      // console.log(Object.keys(oldCheckedMap).length === selectedNum)
       return Object.keys(oldCheckedMap).length === selectedNum
     }
     isSelectedAll()
