@@ -140,6 +140,7 @@ export default {
   position: absolute;
   opacity: 0;
   z-index: -1;
+  font-size: 20px;
   &.show {
     opacity: 1;
     z-index: 9;
